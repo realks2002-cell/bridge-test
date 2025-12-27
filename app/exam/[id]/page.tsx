@@ -253,11 +253,6 @@ export default function ExamPage() {
                         </svg>
                         Colab에서 문제 풀기
                       </a>
-                      {question.코드템플릿 && (
-                        <p className="mt-3 text-sm text-gray-600 text-center">
-                          💡 힌트: {question.코드템플릿.split('\n')[0]}...
-                        </p>
-                      )}
                     </div>
                   ) : (
                     <div className="space-y-2">

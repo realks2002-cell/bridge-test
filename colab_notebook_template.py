@@ -1,8 +1,3 @@
-# ============================================
-# 브릿지 모의고사 - 실습 문제 버전
-# AICE 자격증 실습 모의고사
-# ============================================
-
 # 필요한 라이브러리 설치 및 import
 !pip install ipywidgets -q
 
@@ -14,34 +9,22 @@ import warnings
 import ast
 import io
 import sys
+import urllib.request
+import time
+import base64
+import json
 
 # 경고 무시
 warnings.filterwarnings('ignore', category=pd.errors.ParserWarning)
 
-print("=" * 50)
-print("브릿지 모의고사 - 실습 문제")
-print("=" * 50)
-print()
-
-# ============================================
-# 1. 데이터 로드
-# ============================================
-print("📊 실습 문제 데이터 로드 중...")
-
+# 데이터 로드 (출력 최소화)
 csv_url = 'https://bridge-mock-exam-nextjs.vercel.app/data/exam1.csv'
-print(f"CSV URL: {csv_url}")
-
-# 캐시 방지를 위해 타임스탬프 추가
-import time
 cache_buster = int(time.time())
 csv_url_with_cache = f"{csv_url}?t={cache_buster}&v=2"
 
-# 여러 줄 필드를 포함한 CSV 읽기
-import urllib.request
 response = urllib.request.urlopen(csv_url_with_cache)
 csv_content = response.read().decode('utf-8-sig')
 
-# pandas로 CSV 읽기 (여러 줄 필드 지원)
 df = pd.read_csv(
     io.StringIO(csv_content),
     encoding='utf-8-sig',
@@ -51,14 +34,9 @@ df = pd.read_csv(
     skipinitialspace=True
 )
 
-# ============================================
-# 웹사이트에서 전달된 코드 확인
-# ============================================
+# 웹사이트에서 전달된 코드 확인 (조용히 처리)
 try:
     from google.colab import output
-    import base64
-    
-    # JavaScript를 통해 URL 파라미터 읽기
     js_code = """
     (function() {
         const params = new URLSearchParams(window.location.search);
@@ -71,58 +49,25 @@ try:
         return null;
     })()
     """
-    
-    # JavaScript 실행하여 URL 파라미터 읽기
     result = output.eval_js(js_code)
-    
     if result:
-        import json
         url_params = json.loads(result)
         if url_params.get('code'):
-            # Base64 디코딩
             decoded_code = base64.b64decode(url_params['code']).decode('utf-8')
-            problem_num = url_params.get('problem', '1')
-            exam_id = url_params.get('exam', '1')
-            
-            print("\n" + "=" * 50)
-            print(f"✅ 웹사이트에서 작성한 코드를 감지했습니다! (문제 {problem_num})")
-            print("=" * 50)
-            print("\n아래 코드를 복사하여 문제 풀이 셀에 붙여넣으세요:\n")
-            print("-" * 50)
-            print(decoded_code)
-            print("-" * 50)
-            print("\n또는 아래 변수에서 코드를 사용할 수 있습니다: web_code")
-            print("=" * 50 + "\n")
-            
-            # 코드를 변수에 저장
             web_code = decoded_code
         else:
             web_code = None
     else:
         web_code = None
-except Exception as e:
-    # URL 파라미터가 없거나 읽기 실패 시 무시
+except:
     web_code = None
-    pass
 
 # 문제번호 컬럼이 있으면 제거
 if '문제번호' in df.columns:
     df = df.drop('문제번호', axis=1)
 
-print(f"✅ 데이터 로드 완료! (총 {len(df)}문제)")
-print(f"컬럼명: {df.columns.tolist()}")
-print()
-
-# 실습 문제 형식인지 확인
-if '문제유형' in df.columns and '데이터셋URL' in df.columns and '코드템플릿' in df.columns:
-    print("✅ 실습 문제 형식으로 인식되었습니다.")
-else:
-    print("⚠️ 경고: 실습 문제 형식이 아닙니다!")
-    print("사용 가능한 컬럼:", df.columns.tolist())
-    print("\n첫 번째 문제 미리보기:")
-    if len(df) > 0:
-        print(df.iloc[0].to_dict())
-print()
+# 실습 문제 형식 확인 (조용히)
+is_practice_format = '문제유형' in df.columns and '데이터셋URL' in df.columns and '코드템플릿' in df.columns
 
 # ============================================
 # 2. 실습 문제 풀이 UI 클래스
@@ -445,13 +390,11 @@ class PracticeExamSolver:
         display(widgets.HTML(value=results_html))
 
 # ============================================
-# 3. 문제 풀이 시작
+# 문제 풀이 시작
 # ============================================
 
-# 문제 풀이 시스템 초기화
+# 문제 풀이 시스템 초기화 및 첫 번째 문제 표시
 solver = PracticeExamSolver(df)
-
-# 1번 문제부터 시작
 solver.show_question(1)
 
 # ============================================
