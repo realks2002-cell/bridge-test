@@ -1,29 +1,64 @@
-# 브릿지 모의고사 - 자동 실행 (코드는 숨겨집니다)
+# 브릿지 모의고사 - 자동 실행 (코드는 완전히 숨겨집니다)
 from IPython.display import HTML, display, clear_output
 import base64
 
-# 코드를 HTML로 숨기고 자동 실행
-code_html = """
+# 코드 실행 전에 셀 숨기기 스크립트 실행
+hide_script = """
 <script>
 (function() {
-    // 코드 셀 숨기기
-    setTimeout(function() {
+    // 즉시 코드 셀 숨기기
+    function hideCodeCells() {
         const cells = document.querySelectorAll('.cell');
         cells.forEach(function(cell) {
             const inputArea = cell.querySelector('.input_area');
-            if (inputArea && inputArea.textContent.includes('브릿지 모의고사')) {
-                const codeCell = cell.querySelector('.input');
-                if (codeCell) {
-                    codeCell.style.display = 'none';
+            if (inputArea) {
+                const cellText = inputArea.textContent || '';
+                if (cellText.includes('브릿지 모의고사') || cellText.includes('자동 실행')) {
+                    // 코드 셀 완전히 숨기기
+                    const inputContainer = cell.querySelector('.input');
+                    if (inputContainer) {
+                        inputContainer.style.display = 'none';
+                        inputContainer.style.visibility = 'hidden';
+                        inputContainer.style.height = '0';
+                        inputContainer.style.overflow = 'hidden';
+                    }
+                    // 입력 영역도 숨기기
+                    if (inputArea) {
+                        inputArea.style.display = 'none';
+                        inputArea.style.visibility = 'hidden';
+                        inputArea.style.height = '0';
+                        inputArea.style.overflow = 'hidden';
+                    }
+                    // 셀 헤더도 숨기기
+                    const cellHeader = cell.querySelector('.cell-header');
+                    if (cellHeader) {
+                        cellHeader.style.display = 'none';
+                    }
                 }
             }
         });
-    }, 100);
+    }
+    
+    // 즉시 실행
+    hideCodeCells();
+    
+    // DOM 변경 감지하여 계속 숨기기
+    const observer = new MutationObserver(function(mutations) {
+        hideCodeCells();
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    
+    // 주기적으로도 확인
+    setInterval(hideCodeCells, 100);
 })();
 </script>
 """
 
-display(HTML(code_html))
+display(HTML(hide_script))
 
 # 실제 코드 실행 (숨겨짐)
 exec("""
@@ -246,7 +281,7 @@ solver = PracticeExamSolver(df)
 solver.show_question(1)
 """)
 
-# 코드 셀 완전히 숨기기
+# 코드 셀 완전히 제거 (최종 시도)
 try:
     from google.colab import output
     output.eval_js("""
@@ -255,20 +290,24 @@ try:
         cells.forEach(function(cell) {
             const inputArea = cell.querySelector('.input_area');
             if (inputArea) {
-                const cellContent = inputArea.textContent || '';
-                if (cellContent.includes('브릿지 모의고사') || cellContent.includes('자동 실행')) {
-                    const codeCell = cell.querySelector('.input');
-                    if (codeCell) {
-                        codeCell.style.display = 'none';
+                const cellText = inputArea.textContent || '';
+                if (cellText.includes('브릿지 모의고사') || cellText.includes('자동 실행')) {
+                    // 코드 셀 완전히 제거
+                    const inputContainer = cell.querySelector('.input');
+                    if (inputContainer) {
+                        inputContainer.remove();
                     }
-                    const inputArea = cell.querySelector('.input_area');
                     if (inputArea) {
-                        inputArea.style.display = 'none';
+                        inputArea.remove();
+                    }
+                    const cellHeader = cell.querySelector('.cell-header');
+                    if (cellHeader) {
+                        cellHeader.remove();
                     }
                 }
             }
         });
-    }, 500);
+    }, 1000);
     """)
 except:
     pass
