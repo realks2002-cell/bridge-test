@@ -14,6 +14,8 @@ export default function ListPage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-4">브릿지 모의고사</h1>
             <p className="text-gray-600 text-lg">회차를 선택하여 모의고사를 시작하세요.</p>
           </div>
+          
+          {/* 회차 선택 버튼 */}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {EXAM_DATA.map((exam) => (
