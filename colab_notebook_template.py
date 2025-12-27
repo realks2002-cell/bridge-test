@@ -61,7 +61,7 @@ hide_script = """
 display(HTML(hide_script))
 
 # 실제 코드 실행 (숨겨짐)
-exec("""
+code_to_execute = """
 !pip install ipywidgets -q
 import pandas as pd
 import ipywidgets as widgets
