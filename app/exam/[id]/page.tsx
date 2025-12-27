@@ -16,6 +16,7 @@ export default function ExamPage() {
   const [userAnswers, setUserAnswers] = useState<UserAnswer>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isPracticeFormat, setIsPracticeFormat] = useState(false);
 
   const exam = EXAM_DATA.find((e) => e.id === examId);
 
@@ -29,8 +30,9 @@ export default function ExamPage() {
     const loadData = async () => {
       try {
         const csvUrl = getCsvUrl(exam.csvFilename);
-        const data = await loadExamData(csvUrl);
-        setExamData(data);
+        const { questions, isPracticeFormat } = await loadExamData(csvUrl);
+        setExamData(questions);
+        setIsPracticeFormat(isPracticeFormat);
         setIsLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : '문제를 불러오는 중 오류가 발생했습니다.');
@@ -144,6 +146,63 @@ export default function ExamPage() {
     );
   }
 
+  // 실습 문제 형식인 경우 Colab 노트북 사용 안내
+  if (isPracticeFormat && exam) {
+    return (
+      <>
+        <Header currentPage={exam.title || '문제 풀이'} />
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+              <div className="flex items-start gap-3">
+                <svg
+                  className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-blue-900 mb-2">실습 문제 안내</h3>
+                  <p className="text-sm text-blue-800 mb-4">
+                    이 모의고사는 코드 작성 실습 문제입니다. 웹사이트에서는 풀 수 없으며, Google Colab 노트북에서 풀어주세요.
+                  </p>
+                  <a
+                    href={exam.colabUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors font-medium"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                      />
+                    </svg>
+                    Colab 노트북 열기
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Header currentPage={exam?.title || '문제 풀이'} />
@@ -246,4 +305,5 @@ export default function ExamPage() {
     </>
   );
 }
+
 

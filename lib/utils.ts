@@ -46,11 +46,16 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 /**
- * CSV 텍스트 파싱
+ * CSV 텍스트 파싱 (실습 문제 형식 지원)
  */
 export function parseCSV(csvText: string): Question[] {
   const lines = csvText.trim().split('\n');
+  if (lines.length === 0) return [];
+  
   const headers = lines[0].split(',').map((h) => h.trim());
+  
+  // 실습 문제 형식인지 확인 (문제유형, 데이터셋URL, 코드템플릿 컬럼 존재 여부)
+  const isPracticeFormat = headers.includes('문제유형') || headers.includes('데이터셋URL') || headers.includes('코드템플릿');
   
   const questions: Question[] = [];
   
@@ -60,19 +65,36 @@ export function parseCSV(csvText: string): Question[] {
     
     const values = parseCSVLine(line);
     
-    if (values.length >= headers.length) {
+    if (isPracticeFormat) {
+      // 실습 문제 형식: 문제번호,문제유형,문제,데이터셋URL,코드템플릿,정답코드,해설,난이도
       const question: Question = {
         번호: values[0] || String(i),
-        문제: values[1] || '',
-        선택지1: values[2] || '',
-        선택지2: values[3] || '',
-        선택지3: values[4] || '',
-        선택지4: values[5] || '',
-        정답: values[6] || '',
-        해설: values[7] || '',
+        문제: values[2] || '', // 문제 컬럼
+        선택지1: `[실습 문제] Colab 노트북에서 코드를 작성하여 풀어주세요.`,
+        선택지2: `데이터셋: ${values[3] || ''}`,
+        선택지3: `문제 유형: ${values[1] || '데이터분석'}`,
+        선택지4: `난이도: ${values[7] || '초급'}`,
+        정답: values[5] || '', // 정답코드
+        해설: values[6] || '', // 해설
       };
       
       questions.push(question);
+    } else {
+      // 기존 형식: 문제번호,문제,선택지1,선택지2,선택지3,선택지4,정답,해설
+      if (values.length >= headers.length) {
+        const question: Question = {
+          번호: values[0] || String(i),
+          문제: values[1] || '',
+          선택지1: values[2] || '',
+          선택지2: values[3] || '',
+          선택지3: values[4] || '',
+          선택지4: values[5] || '',
+          정답: values[6] || '',
+          해설: values[7] || '',
+        };
+        
+        questions.push(question);
+      }
     }
   }
   
@@ -107,7 +129,7 @@ function parseCSVLine(line: string): string[] {
 /**
  * CSV 파일 로드
  */
-export async function loadExamData(csvUrl: string): Promise<Question[]> {
+export async function loadExamData(csvUrl: string): Promise<{ questions: Question[]; isPracticeFormat: boolean }> {
   try {
     const response = await fetch(csvUrl);
     
@@ -118,13 +140,21 @@ export async function loadExamData(csvUrl: string): Promise<Question[]> {
     }
     
     const csvText = await response.text();
+    const lines = csvText.trim().split('\n');
+    if (lines.length === 0) {
+      throw new Error('CSV 파일이 비어있습니다.');
+    }
+    
+    const headers = lines[0].split(',').map((h) => h.trim());
+    const isPracticeFormat = headers.includes('문제유형') || headers.includes('데이터셋URL') || headers.includes('코드템플릿');
+    
     const questions = parseCSV(csvText);
     
     if (questions.length === 0) {
       throw new Error('CSV 파일에 문제가 없습니다.');
     }
     
-    return questions;
+    return { questions, isPracticeFormat };
   } catch (error) {
     console.error('CSV 로드 오류:', error);
     throw error;
@@ -144,4 +174,5 @@ export function validateAuthCode(inputCode: string): boolean {
   
   return AUTH_CODES.some((code: string) => code.toUpperCase() === normalizedInput);
 }
+
 
