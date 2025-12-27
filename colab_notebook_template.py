@@ -81,3 +81,26 @@ class PracticeExamSolver:
         score_percent = (correct_count / total_count * 100) if total_count > 0 else 0; results_html += f"""</table><h3 style='color: #1976D2;'>정답 수: {correct_count}/{total_count} ({score_percent:.1f}%)</h3></div>"""; display(widgets.HTML(value=results_html))
 
 solver = PracticeExamSolver(df); solver.show_question(1)
+
+# 코드 실행 후 셀 자동 접기
+try:
+    from google.colab import output
+    output.eval_js("""
+    setTimeout(function() {
+        const cells = document.querySelectorAll('.cell');
+        if (cells.length > 0) {
+            const currentCell = Array.from(cells).find(cell => {
+                const codeCell = cell.querySelector('.input_area');
+                return codeCell && codeCell.textContent.includes('브릿지 모의고사');
+            });
+            if (currentCell) {
+                const collapseButton = currentCell.querySelector('.cell-collapse-button');
+                if (collapseButton && !collapseButton.classList.contains('collapsed')) {
+                    collapseButton.click();
+                }
+            }
+        }
+    }, 500);
+    """)
+except:
+    pass
