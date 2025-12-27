@@ -257,25 +257,18 @@ export default function ExamPage() {
                   {/* 실습 문제 형식일 때 코드 작성 상자 */}
                   {isPracticeFormat ? (
                     <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        코드 작성
-                      </label>
-                      <textarea
-                        value={userCodes[questionNum] || question.코드템플릿 || ''}
-                        onChange={(e) => updateCode(questionNum, e.target.value)}
-                        placeholder="여기에 Python 코드를 작성하세요..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm min-h-[200px] resize-y"
-                        style={{ fontFamily: 'monospace' }}
-                      />
-                      <div className="mt-2 flex gap-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          코드 작성
+                        </label>
                         <a
                           href={exam?.colabUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-sm font-medium"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs font-medium"
                         >
                           <svg
-                            className="w-4 h-4"
+                            className="w-3.5 h-3.5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -290,6 +283,18 @@ export default function ExamPage() {
                           Colab에서 실행
                         </a>
                       </div>
+                      <textarea
+                        value={userCodes[questionNum] || ''}
+                        onChange={(e) => updateCode(questionNum, e.target.value)}
+                        placeholder={question.코드템플릿 || "여기에 Python 코드를 작성하세요..."}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm min-h-[200px] resize-y"
+                        style={{ fontFamily: 'monospace' }}
+                      />
+                      {question.코드템플릿 && (
+                        <p className="mt-2 text-xs text-gray-500">
+                          💡 힌트: {question.코드템플릿.split('\n')[0]}...
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <div className="space-y-2">
