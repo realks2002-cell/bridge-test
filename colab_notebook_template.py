@@ -244,6 +244,7 @@ class PracticeExamSolver:
             return
         
         # 문제 UI
+        code_template_preview = code_template.split('\n')[0] if code_template else ''
         question_html = widgets.HTML(
             value=f"""
             <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;">
@@ -253,6 +254,7 @@ class PracticeExamSolver:
                     <strong>문제 유형:</strong> {problem_type}<br>
                     <strong>데이터셋:</strong> <a href="{dataset_url}" target="_blank">{dataset_url}</a>
                 </p>
+                {f'<p style="font-size: 13px; color: #888; margin-top: 10px; padding: 8px; background-color: #f5f5f5; border-radius: 4px;"><strong>💡 힌트:</strong> {code_template_preview}...</p>' if code_template_preview else ''}
             </div>
             """,
             layout=widgets.Layout(width='100%')
