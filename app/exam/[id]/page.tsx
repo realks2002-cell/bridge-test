@@ -261,27 +261,65 @@ export default function ExamPage() {
                         <label className="block text-sm font-medium text-gray-700">
                           코드 작성
                         </label>
-                        <a
-                          href={exam?.colabUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs font-medium"
-                        >
-                          <svg
-                            className="w-3.5 h-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                        <div className="flex gap-2">
+                          {userCodes[questionNum] && (
+                            <button
+                              onClick={() => {
+                                const code = userCodes[questionNum];
+                                if (navigator.clipboard) {
+                                  navigator.clipboard.writeText(code);
+                                  alert('코드가 클립보드에 복사되었습니다!');
+                                }
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-xs font-medium"
+                            >
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                />
+                              </svg>
+                              복사
+                            </button>
+                          )}
+                          <a
+                            href={(() => {
+                              const code = userCodes[questionNum];
+                              if (code && exam?.colabUrl) {
+                                // 코드를 base64로 인코딩해서 URL 파라미터로 전달
+                                const encodedCode = btoa(unescape(encodeURIComponent(code)));
+                                const problemNum = questionNum;
+                                return `${exam.colabUrl}?code=${encodedCode}&problem=${problemNum}&exam=${exam.id}`;
+                              }
+                              return exam?.colabUrl || '#';
+                            })()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs font-medium"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                            />
-                          </svg>
-                          Colab에서 실행
-                        </a>
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                              />
+                            </svg>
+                            {userCodes[questionNum] ? 'Colab에서 실행' : 'Colab 열기'}
+                          </a>
+                        </div>
                       </div>
                       <textarea
                         value={userCodes[questionNum] || ''}
