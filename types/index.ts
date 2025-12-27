@@ -6,6 +6,7 @@
 export interface ExamData {
   id: number;
   title: string;
+  colabUrl: string; // Google Colab 노트북 URL
   csvFilename: string;
   description: string;
 }

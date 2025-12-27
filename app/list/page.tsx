@@ -70,7 +70,32 @@ export default function ListPage() {
                     </p>
                   </div>
 
-                  {/* 문제 풀기 버튼 */}
+                  {/* Colab 노트북 열기 버튼 (주요 방법) */}
+                  <a
+                    href={exam.colabUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-center font-medium min-h-[44px] mb-3"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                        />
+                      </svg>
+                      Colab 노트북 열기
+                    </span>
+                  </a>
+
+                  {/* 웹에서 문제 풀기 버튼 (선택사항) */}
                   <Link
                     href={`/exam/${exam.id}`}
                     className="block w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-center font-medium min-h-[44px]"
@@ -89,7 +114,7 @@ export default function ListPage() {
                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                         />
                       </svg>
-                      문제 풀기
+                      웹에서 문제 풀기 (선택사항)
                     </span>
                   </Link>
                 </div>
