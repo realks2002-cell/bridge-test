@@ -71,29 +71,50 @@ export default function ListPage() {
                   </div>
 
                   {/* Colab 노트북 열기 버튼 (주요 방법) */}
-                  <a
-                    href={exam.colabUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-center font-medium min-h-[44px] mb-3"
-                  >
-                    <span className="flex items-center justify-center gap-2">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                        />
-                      </svg>
-                      Colab 노트북 열기
-                    </span>
-                  </a>
+                  {exam.colabUrl && !exam.colabUrl.includes('YOUR_NOTEBOOK_ID') ? (
+                    <a
+                      href={exam.colabUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-center font-medium min-h-[44px] mb-3"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                          />
+                        </svg>
+                        Colab 노트북 열기
+                      </span>
+                    </a>
+                  ) : (
+                    <div className="block w-full px-4 py-3 bg-gray-400 text-white rounded-md text-center font-medium min-h-[44px] mb-3 cursor-not-allowed">
+                      <span className="flex items-center justify-center gap-2">
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                          />
+                        </svg>
+                        Colab 노트북 준비 중
+                      </span>
+                    </div>
+                  )}
 
                   {/* 웹에서 문제 풀기 버튼 (선택사항) */}
                   <Link
