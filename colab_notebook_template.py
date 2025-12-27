@@ -54,14 +54,9 @@ df = pd.read_csv(
 # ============================================
 # 웹사이트에서 전달된 코드 확인
 # ============================================
-import urllib.parse
-from IPython.display import HTML, display as ipython_display
-
-# URL 파라미터에서 코드 읽기
 try:
-    # Colab에서 URL 파라미터 읽기
-    from google.colab import _message
-    import json
+    from google.colab import output
+    import base64
     
     # JavaScript를 통해 URL 파라미터 읽기
     js_code = """
@@ -70,29 +65,41 @@ try:
         const code = params.get('code');
         const problem = params.get('problem');
         const exam = params.get('exam');
-        return JSON.stringify({code: code, problem: problem, exam: exam});
+        if (code) {
+            return JSON.stringify({code: code, problem: problem || '1', exam: exam || '1'});
+        }
+        return null;
     })()
     """
     
-    result = _message.blocking_request('execute_javascript', request={'code': js_code}, timeout_sec=5)
-    if result and 'result' in result:
-        url_params = json.loads(result['result'])
+    # JavaScript 실행하여 URL 파라미터 읽기
+    result = output.eval_js(js_code)
+    
+    if result:
+        import json
+        url_params = json.loads(result)
         if url_params.get('code'):
             # Base64 디코딩
-            import base64
             decoded_code = base64.b64decode(url_params['code']).decode('utf-8')
             problem_num = url_params.get('problem', '1')
             exam_id = url_params.get('exam', '1')
             
+            print("\n" + "=" * 50)
             print(f"✅ 웹사이트에서 작성한 코드를 감지했습니다! (문제 {problem_num})")
             print("=" * 50)
-            print("아래 코드를 복사하여 문제 풀이 셀에 붙여넣으세요:")
-            print("=" * 50)
+            print("\n아래 코드를 복사하여 문제 풀이 셀에 붙여넣으세요:\n")
+            print("-" * 50)
             print(decoded_code)
-            print("=" * 50)
+            print("-" * 50)
+            print("\n또는 아래 변수에서 코드를 사용할 수 있습니다: web_code")
+            print("=" * 50 + "\n")
             
-            # 코드를 변수에 저장 (선택사항)
+            # 코드를 변수에 저장
             web_code = decoded_code
+        else:
+            web_code = None
+    else:
+        web_code = None
 except Exception as e:
     # URL 파라미터가 없거나 읽기 실패 시 무시
     web_code = None
