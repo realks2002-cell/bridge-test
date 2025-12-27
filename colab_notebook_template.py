@@ -163,13 +163,14 @@ class PracticeExamSolver:
             explanation = str(row['해설']).strip()
             difficulty = str(row.get('난이도', '초급')).strip()
         except KeyError as e:
-            print(f"⚠️ 오류: 컬럼을 찾을 수 없습니다: {e}")
+            print(f"[경고] 오류: 컬럼을 찾을 수 없습니다: {e}")
             print(f"사용 가능한 컬럼: {row.index.tolist()}")
             return
         
         code_template_preview = code_template.split('\\n')[0] if code_template else ''
+        hint_emoji = '\\U0001F4A1'  # 💡
         question_html = widgets.HTML(
-            value=f"""<div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;"><h2 style="margin-top: 0; color: #1976D2;">문제 {question_num} / {len(self.df)} [{difficulty}]</h2><p style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">{question}</p><p style="font-size: 14px; color: #666;"><strong>문제 유형:</strong> {problem_type}<br><strong>데이터셋:</strong> <a href="{dataset_url}" target="_blank">{dataset_url}</a></p>{f'<p style="font-size: 13px; color: #888; margin-top: 10px; padding: 8px; background-color: #f5f5f5; border-radius: 4px;"><strong>💡 힌트:</strong> {code_template_preview}...</p>' if code_template_preview else ''}</div>""",
+            value=f"""<div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;"><h2 style="margin-top: 0; color: #1976D2;">문제 {question_num} / {len(self.df)} [{difficulty}]</h2><p style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">{question}</p><p style="font-size: 14px; color: #666;"><strong>문제 유형:</strong> {problem_type}<br><strong>데이터셋:</strong> <a href="{dataset_url}" target="_blank">{dataset_url}</a></p>{f'<p style="font-size: 13px; color: #888; margin-top: 10px; padding: 8px; background-color: #f5f5f5; border-radius: 4px;"><strong>{hint_emoji} 힌트:</strong> {code_template_preview}...</p>' if code_template_preview else ''}</div>""",
             layout=widgets.Layout(width='100%')
         )
         code_textarea = widgets.Textarea(
@@ -181,26 +182,26 @@ class PracticeExamSolver:
         )
         result_output = widgets.Output(layout=widgets.Layout(width='100%'))
         button_layout = widgets.Layout(width='120px', margin='5px')
-        prev_button = widgets.Button(description='◀ 이전', button_style='info', layout=button_layout, disabled=(question_num == 1))
-        run_button = widgets.Button(description='▶ 실행', button_style='primary', layout=button_layout)
-        check_button = widgets.Button(description='✓ 정답 확인', button_style='warning', layout=button_layout)
-        next_button = widgets.Button(description='다음 ▶', button_style='info', layout=button_layout, disabled=(question_num == len(self.df)))
+        prev_button = widgets.Button(description='< 이전', button_style='info', layout=button_layout, disabled=(question_num == 1))
+        run_button = widgets.Button(description='> 실행', button_style='primary', layout=button_layout)
+        check_button = widgets.Button(description='[확인] 정답 확인', button_style='warning', layout=button_layout)
+        next_button = widgets.Button(description='다음 >', button_style='info', layout=button_layout, disabled=(question_num == len(self.df)))
         
         def run_code(b):
             user_code = code_textarea.value
             if not user_code or not user_code.strip():
                 with result_output:
                     clear_output()
-                    print("⚠️ 코드를 작성해주세요!")
+                    print("[경고] 코드를 작성해주세요!")
                 return
             self.user_answers[question_num] = user_code
             result, error = self.execute_code(user_code, dataset_url)
             with result_output:
                 clear_output()
                 if error:
-                    print(f"❌ 실행 오류:\\n{error}")
+                    print(f"[오류] 실행 오류:\\n{error}")
                 else:
-                    print(f"✅ 실행 결과:\\n{result}")
+                    print(f"[성공] 실행 결과:\\n{result}")
                     self.user_results[question_num] = result
         
         def check_answer(b):
@@ -208,23 +209,23 @@ class PracticeExamSolver:
             if not user_code or not user_code.strip():
                 with result_output:
                     clear_output()
-                    print("⚠️ 코드를 작성해주세요!")
+                    print("[경고] 코드를 작성해주세요!")
                 return
             self.user_answers[question_num] = user_code
             user_result, error = self.execute_code(user_code, dataset_url)
             if error:
                 with result_output:
                     clear_output()
-                    print(f"❌ 실행 오류:\\n{error}")
+                    print(f"[오류] 실행 오류:\\n{error}")
                 return
             is_correct, correct_result = self.compare_results(user_result, correct_code, dataset_url)
             with result_output:
                 clear_output()
                 if is_correct:
-                    print("✅ 정답입니다!")
+                    print("[정답] 정답입니다!")
                 else:
-                    print(f"❌ 오답입니다.\\n\\n📝 내 결과: {user_result}\\n📝 정답 결과: {correct_result}")
-                print(f"\\n💡 해설: {explanation}")
+                    print(f"[오답] 오답입니다.\\n\\n[내 결과] {user_result}\\n[정답 결과] {correct_result}")
+                print(f"\\n[해설] {explanation}")
         
         def show_prev(b):
             if question_num > 1:
@@ -249,7 +250,7 @@ class PracticeExamSolver:
     def show_results(self):
         total_count = len(self.df)
         correct_count = 0
-        results_html = """<div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;"><h2 style="color: #1976D2;">📊 실습 결과</h2><table border='1' style='border-collapse: collapse; width: 100%; margin: 15px 0;'><tr style='background-color: #2196F3; color: white;'><th style='padding: 10px;'>문제</th><th style='padding: 10px;'>상태</th><th style='padding: 10px;'>내 결과</th></tr>"""
+        results_html = """<div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;"><h2 style="color: #1976D2;">[결과] 실습 결과</h2><table border='1' style='border-collapse: collapse; width: 100%; margin: 15px 0;'><tr style='background-color: #2196F3; color: white;'><th style='padding: 10px;'>문제</th><th style='padding: 10px;'>상태</th><th style='padding: 10px;'>내 결과</th></tr>"""
         for idx, row in self.df.iterrows():
             question_num = idx + 1
             user_code = self.user_answers.get(question_num, '미작성')
@@ -261,16 +262,16 @@ class PracticeExamSolver:
                     is_correct, _ = self.compare_results(user_result, correct_code, dataset_url)
                     if is_correct:
                         correct_count += 1
-                        status = "✅ 정답"
+                        status = "[정답] 정답"
                         bg_color = "#c8e6c9"
                     else:
-                        status = "❌ 오답"
+                        status = "[오답] 오답"
                         bg_color = "#ffcdd2"
                 except:
-                    status = "⚠️ 확인 필요"
+                    status = "[경고] 확인 필요"
                     bg_color = "#fff9c4"
             else:
-                status = "⏸ 미완료"
+                status = "[미완료] 미완료"
                 bg_color = "#e0e0e0"
             results_html += f"""<tr style='background-color: {bg_color};'><td style='padding: 8px; text-align: center;'>{question_num}</td><td style='padding: 8px; text-align: center;'>{status}</td><td style='padding: 8px;'>{str(user_result)[:50]}...</td></tr>"""
         score_percent = (correct_count / total_count * 100) if total_count > 0 else 0
