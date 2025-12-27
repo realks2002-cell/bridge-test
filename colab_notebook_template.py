@@ -275,7 +275,8 @@ class PracticeExamSolver:
                 bg_color = "#e0e0e0"
             results_html += f"""<tr style='background-color: {bg_color};'><td style='padding: 8px; text-align: center;'>{question_num}</td><td style='padding: 8px; text-align: center;'>{status}</td><td style='padding: 8px;'>{str(user_result)[:50]}...</td></tr>"""
         score_percent = (correct_count / total_count * 100) if total_count > 0 else 0
-        results_html += f"""</table><h3 style='color: #1976D2;'>정답 수: {correct_count}/{total_count} ({score_percent:.1f}%)</h3></div>"""
+        score_percent_str = str(round(score_percent, 1))
+        results_html += f"""</table><h3 style='color: #1976D2;'>정답 수: {correct_count}/{total_count} ({score_percent_str}%)</h3></div>"""
         display(widgets.HTML(value=results_html))
 
 solver = PracticeExamSolver(df)
