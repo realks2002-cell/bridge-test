@@ -30,12 +30,27 @@ export default function ExamPage() {
 
     const loadData = async () => {
       try {
+        console.log('=== 문제 데이터 로드 시작 ===');
+        console.log('Exam ID:', examId);
+        console.log('Exam:', exam);
+        
         const csvUrl = getCsvUrl(exam.csvFilename);
+        console.log('CSV URL:', csvUrl);
+        
         const { questions, isPracticeFormat } = await loadExamData(csvUrl);
+        console.log('로드된 문제 수:', questions.length);
+        console.log('실습 문제 형식:', isPracticeFormat);
+        console.log('첫 번째 문제:', questions[0]);
+        
         setExamData(questions);
         setIsPracticeFormat(isPracticeFormat);
         setIsLoading(false);
+        console.log('=== 문제 데이터 로드 완료 ===');
       } catch (err) {
+        console.error('=== CSV 로드 오류 ===');
+        console.error('Error:', err);
+        console.error('Error message:', err instanceof Error ? err.message : String(err));
+        console.error('Error stack:', err instanceof Error ? err.stack : 'No stack');
         setError(err instanceof Error ? err.message : '문제를 불러오는 중 오류가 발생했습니다.');
         setIsLoading(false);
       }

@@ -205,6 +205,9 @@ function parseCSVLine(line: string): string[] {
  */
 export async function loadExamData(csvUrl: string): Promise<{ questions: Question[]; isPracticeFormat: boolean }> {
   try {
+    console.log('=== loadExamData 시작 ===');
+    console.log('입력 CSV URL:', csvUrl);
+    
     // 캐시 방지를 위해 타임스탬프 추가
     const cacheBuster = `?t=${Date.now()}&v=2`;
     const urlWithCache = csvUrl.includes('?') ? `${csvUrl}&${cacheBuster.substring(1)}` : `${csvUrl}${cacheBuster}`;
@@ -220,7 +223,13 @@ export async function loadExamData(csvUrl: string): Promise<{ questions: Questio
       cache: 'no-store',
     });
     
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Response error text:', errorText);
       throw new Error(
         `CSV 파일을 불러올 수 없습니다: ${response.status} ${response.statusText}`
       );
@@ -228,12 +237,19 @@ export async function loadExamData(csvUrl: string): Promise<{ questions: Questio
     
     // UTF-8로 명시적으로 디코딩
     const arrayBuffer = await response.arrayBuffer();
+    console.log('ArrayBuffer 크기:', arrayBuffer.byteLength);
+    
     const decoder = new TextDecoder('utf-8');
     const csvText = decoder.decode(arrayBuffer);
+    console.log('CSV 텍스트 길이:', csvText.length);
+    console.log('CSV 텍스트 처음 500자:', csvText.substring(0, 500));
     
     // 여러 줄 필드를 포함한 CSV 파싱
     const rows = parseCSVWithMultiline(csvText);
+    console.log('파싱된 행 수:', rows.length);
+    
     if (rows.length === 0) {
+      console.error('CSV 파싱 결과: 행이 없습니다.');
       throw new Error('CSV 파일이 비어있습니다.');
     }
     
@@ -249,14 +265,21 @@ export async function loadExamData(csvUrl: string): Promise<{ questions: Questio
     console.log('CSV 로드 - 코드템플릿 포함:', headers.includes('코드템플릿'));
     
     const questions = parseCSV(csvText);
+    console.log('파싱된 문제 수:', questions.length);
     
     if (questions.length === 0) {
+      console.error('문제가 없습니다.');
       throw new Error('CSV 파일에 문제가 없습니다.');
     }
     
+    console.log('=== loadExamData 완료 ===');
     return { questions, isPracticeFormat };
   } catch (error) {
-    console.error('CSV 로드 오류:', error);
+    console.error('=== CSV 로드 오류 발생 ===');
+    console.error('Error type:', typeof error);
+    console.error('Error:', error);
+    console.error('Error message:', error instanceof Error ? error.message : String(error));
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
     throw error;
   }
 }
