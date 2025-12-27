@@ -80,38 +80,20 @@ export default function ExamPage() {
     const results: ExamResult[] = examData.map((question, index) => {
       const questionNum = index + 1;
       
-      if (isPracticeFormat) {
-        const userCode = userCodes[questionNum] || '';
-        const correctAnswer = question.정답;
-        // 실습 문제는 코드가 작성되었는지만 확인 (정확한 검증은 Colab에서)
-        const isCorrect = userCode.trim() !== '';
-        
-        if (isCorrect) correctCount++;
+      const userAnswer = userAnswers[questionNum];
+      const correctAnswer = question.정답;
+      const isCorrect = userAnswer === correctAnswer;
 
-        return {
-          번호: questionNum,
-          문제: question.문제,
-          사용자답: userCode || '코드 미작성',
-          정답: correctAnswer,
-          정오: isCorrect,
-          해설: question.해설,
-        };
-      } else {
-        const userAnswer = userAnswers[questionNum];
-        const correctAnswer = question.정답;
-        const isCorrect = userAnswer === correctAnswer;
+      if (isCorrect) correctCount++;
 
-        if (isCorrect) correctCount++;
-
-        return {
-          번호: questionNum,
-          문제: question.문제,
-          사용자답: userAnswer || '미답',
-          정답: correctAnswer,
-          정오: isCorrect,
-          해설: question.해설,
-        };
-      }
+      return {
+        번호: questionNum,
+        문제: question.문제,
+        사용자답: userAnswer || '미답',
+        정답: correctAnswer,
+        정오: isCorrect,
+        해설: question.해설,
+      };
     });
 
     const score = Math.round((correctCount / examData.length) * 100);
@@ -135,12 +117,10 @@ export default function ExamPage() {
     router.push(`/result/${exam.id}`);
   };
 
-  const answeredCount = isPracticeFormat 
-    ? Object.keys(userCodes).filter(key => userCodes[parseInt(key)]?.trim() !== '').length
-    : Object.keys(userAnswers).length;
+  const answeredCount = Object.keys(userAnswers).length;
   const totalCount = examData.length;
   const progress = totalCount > 0 ? Math.round((answeredCount / totalCount) * 100) : 0;
-  const canSubmit = answeredCount === totalCount && totalCount > 0;
+  const canSubmit = !isPracticeFormat && answeredCount === totalCount && totalCount > 0;
 
   if (isLoading) {
     return (
@@ -229,11 +209,6 @@ export default function ExamPage() {
                             {question.난이도}
                           </span>
                         )}
-                        {hasCode && (
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                            코드 작성 완료
-                          </span>
-                        )}
                       </div>
                     </div>
                     <p className="text-gray-800 leading-relaxed mb-3">{question.문제}</p>
@@ -254,82 +229,32 @@ export default function ExamPage() {
                     )}
                   </div>
 
-                  {/* 실습 문제 형식일 때 코드 작성 상자 */}
+                  {/* 실습 문제 형식일 때 Colab 이동 버튼 */}
                   {isPracticeFormat ? (
-                    <div className="mt-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          코드 작성
-                        </label>
-                        <div className="flex gap-2">
-                          {userCodes[questionNum] && (
-                            <button
-                              onClick={() => {
-                                const code = userCodes[questionNum];
-                                if (navigator.clipboard) {
-                                  navigator.clipboard.writeText(code);
-                                  alert('코드가 클립보드에 복사되었습니다!');
-                                }
-                              }}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-xs font-medium"
-                            >
-                              <svg
-                                className="w-3.5 h-3.5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                                />
-                              </svg>
-                              복사
-                            </button>
-                          )}
-                          <a
-                            href={(() => {
-                              const code = userCodes[questionNum];
-                              if (code && exam?.colabUrl) {
-                                // 코드를 base64로 인코딩해서 URL 파라미터로 전달
-                                const encodedCode = btoa(unescape(encodeURIComponent(code)));
-                                const problemNum = questionNum;
-                                return `${exam.colabUrl}?code=${encodedCode}&problem=${problemNum}&exam=${exam.id}`;
-                              }
-                              return exam?.colabUrl || '#';
-                            })()}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs font-medium"
-                          >
-                            <svg
-                              className="w-3.5 h-3.5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                              />
-                            </svg>
-                            {userCodes[questionNum] ? 'Colab에서 실행' : 'Colab 열기'}
-                          </a>
-                        </div>
-                      </div>
-                      <textarea
-                        value={userCodes[questionNum] || ''}
-                        onChange={(e) => updateCode(questionNum, e.target.value)}
-                        placeholder={question.코드템플릿 || "여기에 Python 코드를 작성하세요..."}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm min-h-[200px] resize-y"
-                        style={{ fontFamily: 'monospace' }}
-                      />
+                    <div className="mt-6">
+                      <a
+                        href={exam?.colabUrl || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors font-medium text-base min-h-[56px]"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                          />
+                        </svg>
+                        Colab에서 문제 풀기
+                      </a>
                       {question.코드템플릿 && (
-                        <p className="mt-2 text-xs text-gray-500">
+                        <p className="mt-3 text-sm text-gray-600 text-center">
                           💡 힌트: {question.코드템플릿.split('\n')[0]}...
                         </p>
                       )}
@@ -372,7 +297,7 @@ export default function ExamPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
               <div className="text-sm text-gray-600">
                 <span className="font-semibold">{answeredCount}</span> /{' '}
-                <span>{totalCount}</span> {isPracticeFormat ? '문제 코드 작성 완료' : '문제 풀이 완료'}
+                <span>{totalCount}</span> 문제 풀이 완료
               </div>
               <div className="flex gap-3">
                 <button
