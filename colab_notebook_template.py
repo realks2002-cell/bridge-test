@@ -61,7 +61,7 @@ hide_script = """
 display(HTML(hide_script))
 
 # 실제 코드 실행 (숨겨짐)
-code_to_execute = """
+code_to_execute = r'''
 !pip install ipywidgets -q
 import pandas as pd
 import ipywidgets as widgets
@@ -283,7 +283,7 @@ class PracticeExamSolver:
 
 solver = PracticeExamSolver(df)
 solver.show_question(1)
-"""
+'''
 exec(code_to_execute)
 
 # 코드 셀 완전히 제거 (최종 시도)
