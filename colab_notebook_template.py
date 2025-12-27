@@ -281,7 +281,8 @@ class PracticeExamSolver:
 
 solver = PracticeExamSolver(df)
 solver.show_question(1)
-""")
+"""
+exec(code_to_execute)
 
 # 코드 셀 완전히 제거 (최종 시도)
 try:
