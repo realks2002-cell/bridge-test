@@ -258,10 +258,10 @@ class PracticeExamSolver:
             layout=widgets.Layout(width='100%')
         )
         
-        # 코드 입력 영역
+        # 코드 입력 영역 (빈 상태로 시작)
         code_textarea = widgets.Textarea(
-            value=self.user_answers.get(question_num, code_template),
-            placeholder='여기에 코드를 작성하세요...',
+            value=self.user_answers.get(question_num, ''),
+            placeholder=code_template if code_template else '여기에 코드를 작성하세요...',
             description='코드 작성:',
             layout=widgets.Layout(width='100%', height='200px'),
             style={'description_width': 'initial'}
@@ -302,7 +302,7 @@ class PracticeExamSolver:
         def run_code(b):
             """코드 실행"""
             user_code = code_textarea.value
-            if not user_code or user_code.strip() == code_template.strip():
+            if not user_code or not user_code.strip():
                 with result_output:
                     clear_output()
                     print("⚠️ 코드를 작성해주세요!")
@@ -325,7 +325,7 @@ class PracticeExamSolver:
         def check_answer(b):
             """정답 확인"""
             user_code = code_textarea.value
-            if not user_code or user_code.strip() == code_template.strip():
+            if not user_code or not user_code.strip():
                 with result_output:
                     clear_output()
                     print("⚠️ 코드를 작성해주세요!")
