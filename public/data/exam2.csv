@@ -1,12 +1,31 @@
-문제번호,문제,선택지1,선택지2,선택지3,선택지4,정답,해설
-1,다음 중 데이터 전처리 단계가 아닌 것은?,결측치 처리,이상치 제거,데이터 시각화,데이터 정규화,3,데이터 시각화는 전처리가 아닌 분석 단계입니다.
-2,다음 중 연속형 변수는?,성별,나이,직업,지역,2,나이는 연속형 변수입니다.
-3,상관계수(Correlation)의 범위는?,-1과 1 사이,0과 1 사이,-무한대와 무한대,0과 100 사이,1,상관계수는 -1과 1 사이의 값을 가집니다.
-4,다음 중 비지도학습(Unsupervised Learning)에 해당하는 것은?,로지스틱 회귀,의사결정나무,군집분석,랜덤포레스트,3,군집분석은 비지도학습입니다.
-5,과적합(Overfitting)을 방지하는 방법이 아닌 것은?,정규화,교차검증,더 많은 데이터,모델 복잡도 증가,4,모델 복잡도 증가는 과적합을 악화시킵니다.
-6,다음 중 회귀 문제가 아닌 것은?,주가 예측,온도 예측,이미지 분류,매출 예측,3,이미지 분류는 분류 문제입니다.
-7,정밀도(Precision)의 정의는?,전체 중 정확히 예측한 비율,양성으로 예측한 것 중 실제 양성 비율,실제 양성 중 정확히 예측한 비율,전체 데이터 중 양성 비율,2,정밀도는 양성으로 예측한 것 중 실제 양성의 비율입니다.
-8,다음 중 범주형 변수는?,키,몸무게,혈액형,시력,3,혈액형은 범주형 변수입니다.
-9,다음 중 차원 축소 기법이 아닌 것은?,주성분분석,특성 선택,특성 추출,데이터 증강,4,데이터 증강은 차원을 늘리는 기법입니다.
-10,다음 중 분류 모델 평가 지표가 아닌 것은?,정확도,재현율,F1-Score,평균제곱오차,4,평균제곱오차는 회귀 모델 평가 지표입니다.
-
+문제번호,문제유형,문제,데이터셋URL,코드템플릿,정답코드,해설,난이도
+1,전처리,결측치가 있는 컬럼의 이름을 모두 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df.columns[df.isnull().any()].tolist(),isnull().any()로 결측치가 있는 컬럼을 찾고, columns로 컬럼명을 가져올 수 있습니다.,중급
+2,데이터분석,연속형 변수인 나이(age)와 요금(fare)의 상관계수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df[['age', 'fare']].corr().iloc[0, 1],corr() 메서드로 상관계수를 구할 수 있습니다. 상관계수는 -1과 1 사이의 값을 가집니다.,중급
+3,데이터분석,범주형 변수인 성별(sex)의 고유값을 모두 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df['sex'].unique().tolist(),unique() 메서드를 사용하면 고유값을 구할 수 있습니다.,초급
+4,데이터분석,비지도학습의 예시로, 객실 등급(pclass)별로 그룹화하여 각 그룹의 평균 요금을 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df.groupby('pclass')['fare'].mean(),groupby()를 사용하면 그룹별 집계를 수행할 수 있습니다.,중급
+5,전처리,과적합 방지를 위해 데이터의 기본 정보를 확인하세요. 데이터의 행 수와 컬럼 수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df.shape,shape 속성을 사용하면 (행 수, 컬럼 수) 튜플을 얻을 수 있습니다.,초급
+6,데이터분석,회귀 문제 예시: 나이(age)와 요금(fare)의 관계를 확인하기 위해 나이가 30 이상인 승객의 평균 요금을 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df[df['age'] >= 30]['fare'].mean(),조건부 필터링 후 특정 컬럼의 평균을 구할 수 있습니다.,초급
+7,통계,정밀도 계산 예시: 생존한 승객(survived=1) 중 여성의 비율을 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,(df[(df['survived'] == 1) & (df['sex'] == 'female')].shape[0] / df[df['survived'] == 1].shape[0]),조건을 만족하는 데이터의 비율을 계산할 수 있습니다.,중급
+8,데이터분석,범주형 변수인 객실 등급(pclass)의 각 값별 빈도를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df['pclass'].value_counts(),value_counts()를 사용하면 각 값의 빈도를 구할 수 있습니다.,초급
+9,전처리,차원 축소 전 데이터 확인: 데이터의 컬럼 수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,len(df.columns),len() 함수와 columns 속성을 사용하면 컬럼 수를 구할 수 있습니다.,초급
+10,통계,분류 모델 평가 예시: 전체 승객 중 생존한 승객의 비율(정확도 개념)을 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df['survived'].mean(),생존 여부가 0 또는 1이므로 평균값이 생존 비율(정확도 개념)이 됩니다.,초급

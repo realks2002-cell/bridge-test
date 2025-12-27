@@ -1,12 +1,31 @@
-문제번호,문제,선택지1,선택지2,선택지3,선택지4,정답,해설
-1,다음 중 빅데이터의 3V 특성이 아닌 것은?,Volume,Variety,Velocity,Veracity,4,빅데이터의 3V는 Volume, Variety, Velocity입니다.
-2,데이터 분석에서 이상치를 처리하는 방법이 아닌 것은?,삭제,평균값으로 대체,중앙값으로 대체,무시,4,이상치는 분석에 영향을 줄 수 있으므로 적절히 처리해야 합니다.
-3,다음 중 머신러닝 알고리즘이 아닌 것은?,선형회귀,의사결정나무,랜덤포레스트,엑셀,4,엑셀은 스프레드시트 프로그램입니다.
-4,정규화(Normalization)의 목적은?,데이터 크기 조정,데이터 타입 변환,데이터 삭제,데이터 복사,1,정규화는 데이터의 범위를 조정하여 비교 가능하게 만듭니다.
-5,다음 중 지도학습(Supervised Learning)에 해당하는 것은?,K-means,주성분분석,회귀분석,군집분석,3,회귀분석은 지도학습 알고리즘입니다.
-6,교차검증(Cross Validation)의 장점은?,모델 성능 평가,과적합 방지,데이터 활용 극대화,모두 해당,4,교차검증은 모든 장점을 가지고 있습니다.
-7,다음 중 분류 문제가 아닌 것은?,이메일 스팸 분류,이미지 인식,주가 예측,의료 진단,3,주가 예측은 회귀 문제입니다.
-8,특성 선택(Feature Selection)의 목적은?,모델 성능 향상,계산 비용 감소,해석 가능성 향상,모두 해당,4,특성 선택은 모든 목적을 달성합니다.
-9,다음 중 앙상블 학습이 아닌 것은?,배깅,부스팅,스태킹,단일 모델,4,단일 모델은 앙상블 학습이 아닙니다.
-10,ROC 곡선의 AUC 값이 1에 가까울수록?,모델 성능이 좋음,모델 성능이 나쁨,과적합 가능성,과소적합 가능성,1,AUC가 1에 가까울수록 모델 성능이 좋습니다.
-
+문제번호,문제유형,문제,데이터셋URL,코드템플릿,정답코드,해설,난이도
+1,데이터분석,다음 데이터셋을 로드하고 전체 행 수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,len(df),pandas의 len() 함수를 사용하면 데이터프레임의 행 수를 구할 수 있습니다.,초급
+2,전처리,결측치가 있는 행을 제거한 후 데이터의 행 수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,len(df.dropna()),dropna() 메서드를 사용하면 결측치가 있는 행을 제거할 수 있습니다.,초급
+3,데이터분석,나이가 30세 이상인 승객의 수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,len(df[df['age'] >= 30]),조건부 필터링을 사용하여 특정 조건을 만족하는 데이터만 선택할 수 있습니다.,초급
+4,전처리,나이(age) 컬럼의 결측치를 평균값으로 채운 후, 평균 나이를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df['age'].fillna(df['age'].mean()).mean(),fillna() 메서드로 결측치를 채우고, mean()으로 평균을 구할 수 있습니다.,중급
+5,데이터분석,생존한 승객(survived=1) 중 여성(female)의 수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,len(df[(df['survived'] == 1) & (df['sex'] == 'female')]),여러 조건을 &(AND) 연산자로 결합하여 필터링할 수 있습니다.,초급
+6,통계,생존률(생존한 승객 수 / 전체 승객 수)을 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df['survived'].mean(),생존 여부가 0 또는 1이므로 평균값이 생존률이 됩니다.,중급
+7,데이터분석,객실 등급(pclass)별 평균 나이를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df.groupby('pclass')['age'].mean(),groupby()를 사용하면 그룹별 집계를 수행할 수 있습니다.,중급
+8,데이터분석,생존한 승객과 사망한 승객의 수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df['survived'].value_counts(),value_counts()를 사용하면 각 값의 빈도를 구할 수 있습니다.,초급
+9,데이터분석,객실 등급(pclass)별 생존자 수를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df[df['survived'] == 1].groupby('pclass').size(),생존한 승객만 필터링한 후 그룹별 집계를 수행합니다.,중급
+10,통계,승객들의 평균 나이를 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,import pandas as pd
+df = pd.read_csv('데이터셋URL')
+# 여기에 코드를 작성하세요,df['age'].mean(),mean() 메서드를 사용하면 평균값을 구할 수 있습니다.,초급
