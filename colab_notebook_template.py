@@ -168,9 +168,11 @@ class PracticeExamSolver:
             return
         
         code_template_preview = code_template.split('\\n')[0] if code_template else ''
-        hint_emoji = '\\U0001F4A1'  # 💡
+        hint_html = ''
+        if code_template_preview:
+            hint_html = f'<p style="font-size: 13px; color: #888; margin-top: 10px; padding: 8px; background-color: #f5f5f5; border-radius: 4px;"><strong>[힌트]</strong> {code_template_preview}...</p>'
         question_html = widgets.HTML(
-            value=f"""<div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;"><h2 style="margin-top: 0; color: #1976D2;">문제 {question_num} / {len(self.df)} [{difficulty}]</h2><p style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">{question}</p><p style="font-size: 14px; color: #666;"><strong>문제 유형:</strong> {problem_type}<br><strong>데이터셋:</strong> <a href="{dataset_url}" target="_blank">{dataset_url}</a></p>{f'<p style="font-size: 13px; color: #888; margin-top: 10px; padding: 8px; background-color: #f5f5f5; border-radius: 4px;"><strong>{hint_emoji} 힌트:</strong> {code_template_preview}...</p>' if code_template_preview else ''}</div>""",
+            value=f"""<div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;"><h2 style="margin-top: 0; color: #1976D2;">문제 {question_num} / {len(self.df)} [{difficulty}]</h2><p style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px;">{question}</p><p style="font-size: 14px; color: #666;"><strong>문제 유형:</strong> {problem_type}<br><strong>데이터셋:</strong> <a href="{dataset_url}" target="_blank">{dataset_url}</a></p>{hint_html}</div>""",
             layout=widgets.Layout(width='100%')
         )
         code_textarea = widgets.Textarea(
