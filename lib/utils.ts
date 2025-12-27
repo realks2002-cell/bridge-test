@@ -46,24 +46,23 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 /**
- * CSV 텍스트 파싱 (실습 문제 형식 지원)
+ * CSV 텍스트 파싱 (실습 문제 형식 지원, 여러 줄 필드 처리)
  */
 export function parseCSV(csvText: string): Question[] {
-  const lines = csvText.trim().split('\n');
-  if (lines.length === 0) return [];
+  // 여러 줄 필드를 포함한 CSV 파싱
+  const rows = parseCSVWithMultiline(csvText);
+  if (rows.length === 0) return [];
   
-  const headers = lines[0].split(',').map((h) => h.trim());
+  const headers = rows[0].map((h) => h.trim());
   
   // 실습 문제 형식인지 확인 (문제유형, 데이터셋URL, 코드템플릿 컬럼 존재 여부)
   const isPracticeFormat = headers.includes('문제유형') || headers.includes('데이터셋URL') || headers.includes('코드템플릿');
   
   const questions: Question[] = [];
   
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-    
-    const values = parseCSVLine(line);
+  for (let i = 1; i < rows.length; i++) {
+    const values = rows[i];
+    if (values.length === 0) continue;
     
     if (isPracticeFormat) {
       // 실습 문제 형식: 문제번호,문제유형,문제,데이터셋URL,코드템플릿,정답코드,해설,난이도
@@ -102,7 +101,68 @@ export function parseCSV(csvText: string): Question[] {
 }
 
 /**
- * CSV 라인 파싱 (쉼표와 따옴표 처리)
+ * CSV 파싱 (여러 줄 필드 지원)
+ */
+function parseCSVWithMultiline(csvText: string): string[][] {
+  const rows: string[][] = [];
+  const lines = csvText.split(/\r?\n/);
+  
+  let currentRow: string[] = [];
+  let currentField = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    for (let j = 0; j < line.length; j++) {
+      const char = line[j];
+      const nextChar = j < line.length - 1 ? line[j + 1] : null;
+      
+      if (char === '"') {
+        // 이스케이프된 따옴표 처리 ("")
+        if (nextChar === '"' && inQuotes) {
+          currentField += '"';
+          j++; // 다음 문자 건너뛰기
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        // 필드 구분자
+        currentRow.push(currentField.trim());
+        currentField = '';
+      } else {
+        currentField += char;
+      }
+    }
+    
+    // 따옴표 안이 아니면 줄바꿈 처리, 따옴표 안이면 줄바꿈을 필드에 포함
+    if (!inQuotes) {
+      currentRow.push(currentField.trim());
+      currentField = '';
+      
+      if (currentRow.length > 0 && currentRow.some(field => field.length > 0)) {
+        rows.push(currentRow);
+      }
+      currentRow = [];
+    } else {
+      // 따옴표 안이면 줄바꿈을 필드에 포함
+      currentField += '\n';
+    }
+  }
+  
+  // 마지막 필드 처리
+  if (currentField.trim() || currentRow.length > 0) {
+    currentRow.push(currentField.trim());
+    if (currentRow.some(field => field.length > 0)) {
+      rows.push(currentRow);
+    }
+  }
+  
+  return rows;
+}
+
+/**
+ * CSV 라인 파싱 (쉼표와 따옴표 처리) - 단일 줄용
  */
 function parseCSVLine(line: string): string[] {
   const values: string[] = [];
@@ -131,7 +191,15 @@ function parseCSVLine(line: string): string[] {
  */
 export async function loadExamData(csvUrl: string): Promise<{ questions: Question[]; isPracticeFormat: boolean }> {
   try {
-    const response = await fetch(csvUrl);
+    // 캐시 방지를 위해 타임스탬프 추가
+    const cacheBuster = `?t=${Date.now()}`;
+    const urlWithCache = csvUrl.includes('?') ? `${csvUrl}&${cacheBuster.substring(1)}` : `${csvUrl}${cacheBuster}`;
+    
+    const response = await fetch(urlWithCache, {
+      headers: {
+        'Accept': 'text/csv; charset=utf-8',
+      },
+    });
     
     if (!response.ok) {
       throw new Error(
@@ -139,7 +207,10 @@ export async function loadExamData(csvUrl: string): Promise<{ questions: Questio
       );
     }
     
-    const csvText = await response.text();
+    // UTF-8로 명시적으로 디코딩
+    const arrayBuffer = await response.arrayBuffer();
+    const decoder = new TextDecoder('utf-8');
+    const csvText = decoder.decode(arrayBuffer);
     const lines = csvText.trim().split('\n');
     if (lines.length === 0) {
       throw new Error('CSV 파일이 비어있습니다.');
