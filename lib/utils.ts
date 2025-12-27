@@ -51,12 +51,21 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 export function parseCSV(csvText: string): Question[] {
   // 여러 줄 필드를 포함한 CSV 파싱
   const rows = parseCSVWithMultiline(csvText);
-  if (rows.length === 0) return [];
+  if (rows.length === 0) {
+    console.error('CSV 파싱 실패: 행이 없습니다.');
+    return [];
+  }
   
   const headers = rows[0].map((h) => h.trim());
+  console.log('CSV 헤더:', headers);
   
   // 실습 문제 형식인지 확인 (문제유형, 데이터셋URL, 코드템플릿 컬럼 존재 여부)
   const isPracticeFormat = headers.includes('문제유형') || headers.includes('데이터셋URL') || headers.includes('코드템플릿');
+  console.log('실습 문제 형식 여부:', isPracticeFormat);
+  
+  if (!isPracticeFormat) {
+    console.warn('CSV가 실습 문제 형식이 아닙니다. 헤더:', headers);
+  }
   
   const questions: Question[] = [];
   
@@ -97,6 +106,7 @@ export function parseCSV(csvText: string): Question[] {
     }
   }
   
+  console.log(`총 ${questions.length}개의 문제를 파싱했습니다.`);
   return questions;
 }
 
@@ -192,13 +202,18 @@ function parseCSVLine(line: string): string[] {
 export async function loadExamData(csvUrl: string): Promise<{ questions: Question[]; isPracticeFormat: boolean }> {
   try {
     // 캐시 방지를 위해 타임스탬프 추가
-    const cacheBuster = `?t=${Date.now()}`;
+    const cacheBuster = `?t=${Date.now()}&v=2`;
     const urlWithCache = csvUrl.includes('?') ? `${csvUrl}&${cacheBuster.substring(1)}` : `${csvUrl}${cacheBuster}`;
+    
+    console.log('CSV 파일 로드 시도:', urlWithCache);
     
     const response = await fetch(urlWithCache, {
       headers: {
         'Accept': 'text/csv; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
       },
+      cache: 'no-store',
     });
     
     if (!response.ok) {
@@ -219,7 +234,9 @@ export async function loadExamData(csvUrl: string): Promise<{ questions: Questio
     }
     
     const headers = rows[0].map((h) => h.trim());
+    console.log('CSV 로드 - 헤더:', headers);
     const isPracticeFormat = headers.includes('문제유형') || headers.includes('데이터셋URL') || headers.includes('코드템플릿');
+    console.log('CSV 로드 - 실습 문제 형식:', isPracticeFormat);
     
     const questions = parseCSV(csvText);
     
