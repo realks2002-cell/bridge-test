@@ -2,10 +2,13 @@
 
 import Link from 'next/link';
 import { EXAM_DATA } from '@/lib/config';
+import Header from '@/components/Header';
 
 export default function ListPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <Header currentPage="모의고사 리스트" />
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">브릿지 모의고사</h1>
@@ -36,6 +39,7 @@ export default function ListPage() {
           </div>
         </div>
       </div>
+    </>
   );
 }
 
