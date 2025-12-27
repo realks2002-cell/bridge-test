@@ -9,21 +9,21 @@ export const EXAM_DATA: ExamData[] = [
   {
     id: 1,
     title: '1회차 모의고사',
-    colabUrl: 'https://colab.research.google.com/drive/YOUR_NOTEBOOK_ID_1', // 실제 Colab 노트북 URL로 변경 필요
+    colabUrl: 'https://colab.research.google.com/drive/1yJ-DOQaqh3ACIWdSGF4aBNtZ1OK5VAT5',
     csvFilename: 'exam1.csv',
     description: 'AICE 자격증 1회차 모의고사',
   },
   {
     id: 2,
     title: '2회차 모의고사',
-    colabUrl: 'https://colab.research.google.com/drive/YOUR_NOTEBOOK_ID_2', // 실제 Colab 노트북 URL로 변경 필요
+    colabUrl: 'https://colab.research.google.com/drive/1yJ-DOQaqh3ACIWdSGF4aBNtZ1OK5VAT5', // 나중에 별도 노트북으로 변경 가능
     csvFilename: 'exam2.csv',
     description: 'AICE 자격증 2회차 모의고사',
   },
   {
     id: 3,
     title: '3회차 모의고사',
-    colabUrl: 'https://colab.research.google.com/drive/YOUR_NOTEBOOK_ID_3', // 실제 Colab 노트북 URL로 변경 필요
+    colabUrl: 'https://colab.research.google.com/drive/1yJ-DOQaqh3ACIWdSGF4aBNtZ1OK5VAT5', // 나중에 별도 노트북으로 변경 가능
     csvFilename: 'exam3.csv',
     description: '빅데이터 분석기사 1회차 모의고사',
   },
