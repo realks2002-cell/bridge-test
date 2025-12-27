@@ -239,8 +239,14 @@ export async function loadExamData(csvUrl: string): Promise<{ questions: Questio
     
     const headers = rows[0].map((h) => h.trim());
     console.log('CSV 로드 - 헤더:', headers);
+    console.log('CSV 로드 - 헤더 길이:', headers.length);
+    console.log('CSV 로드 - 첫 번째 행:', rows[0]);
+    
     const isPracticeFormat = headers.includes('문제유형') || headers.includes('데이터셋URL') || headers.includes('코드템플릿');
     console.log('CSV 로드 - 실습 문제 형식:', isPracticeFormat);
+    console.log('CSV 로드 - 문제유형 포함:', headers.includes('문제유형'));
+    console.log('CSV 로드 - 데이터셋URL 포함:', headers.includes('데이터셋URL'));
+    console.log('CSV 로드 - 코드템플릿 포함:', headers.includes('코드템플릿'));
     
     const questions = parseCSV(csvText);
     
