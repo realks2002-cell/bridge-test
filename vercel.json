@@ -1,9 +1,7 @@
 {
-  "name": "bridge-mock-exam",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "regions": ["icn1"]
+  "framework": "nextjs"
 }
 

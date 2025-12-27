@@ -6,7 +6,6 @@
 export interface ExamData {
   id: number;
   title: string;
-  colabUrl: string;
   csvFilename: string;
   description: string;
 }
