@@ -1,6 +1,8 @@
 # 브릿지 모의고사 - 자동 실행 (코드는 완전히 숨겨집니다)
 from IPython.display import HTML, display, clear_output
 import base64
+import subprocess
+import sys
 
 # 코드 실행 전에 셀 숨기기 스크립트 실행
 hide_script = """
@@ -60,9 +62,11 @@ hide_script = """
 
 display(HTML(hide_script))
 
+# 필요한 패키지 설치 (한 번만 실행)
+subprocess.run([sys.executable, "-m", "pip", "install", "ipywidgets", "-q"], check=True)
+
 # 실제 코드 실행 (숨겨짐)
 code_to_execute = r'''
-!pip install ipywidgets -q
 import pandas as pd
 import ipywidgets as widgets
 from IPython.display import display, clear_output
