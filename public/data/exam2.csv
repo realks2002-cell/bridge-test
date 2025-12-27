@@ -29,3 +29,4 @@ df = pd.read_csv('데이터셋URL')
 10,통계,분류 모델 평가 예시: 전체 승객 중 생존한 승객의 비율(정확도 개념)을 구하세요.,https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv,"import pandas as pd
 df = pd.read_csv('데이터셋URL')
 # 여기에 코드를 작성하세요",df['survived'].mean(),생존 여부가 0 또는 1이므로 평균값이 생존 비율(정확도 개념)이 됩니다.,초급
+
