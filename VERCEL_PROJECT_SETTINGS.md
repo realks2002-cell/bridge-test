@@ -49,3 +49,5 @@ https://bridge-test-nine.vercel.app
 4. **"Private Repository Name"** 필드에: `bridge-mock-exam` 입력
 5. **"Deploy"** 클릭
 
+
+

@@ -73,3 +73,5 @@ df = pd.read_csv('https://bridge-mock-exam.vercel.app/data/exam1.csv', encoding=
 
 배포가 성공적으로 완료되었습니다. 사이트에 접속하여 모든 기능이 정상 작동하는지 확인하세요!
 
+
+

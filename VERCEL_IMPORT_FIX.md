@@ -41,3 +41,5 @@ Vercel이 `KS-Tech-DEPT` 계정과 연결되어 있어서 `realks2002-cell` 저�
 3. Project Name: `bridge-mock-exam` 입력
 4. **"Deploy"** 클릭
 
+
+

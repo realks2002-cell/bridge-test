@@ -21,6 +21,10 @@ export interface Question {
   선택지4: string;
   정답: string;
   해설: string;
+  코드템플릿?: string; // 실습 문제용
+  데이터셋URL?: string; // 실습 문제용
+  문제유형?: string; // 실습 문제용
+  난이도?: string; // 실습 문제용
 }
 
 // 사용자 답안 타입

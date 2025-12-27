@@ -84,6 +84,10 @@ export function parseCSV(csvText: string): Question[] {
         선택지4: `난이도: ${values[7] || '초급'}`,
         정답: values[5] || '', // 정답코드
         해설: values[6] || '', // 해설
+        코드템플릿: values[4] || '', // 코드 템플릿
+        데이터셋URL: values[3] || '', // 데이터셋 URL
+        문제유형: values[1] || '', // 문제 유형
+        난이도: values[7] || '', // 난이도
       };
       
       questions.push(question);

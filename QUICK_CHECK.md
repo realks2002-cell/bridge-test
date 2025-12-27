@@ -47,3 +47,5 @@ vercel --prod
 - [ ] 있으면 → Ctrl + Shift + R로 강력 새로고침
 - [ ] 여전히 있으면 → Git으로 재배포 트리거
 
+
+

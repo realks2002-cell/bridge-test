@@ -112,3 +112,5 @@ export const EXAM_DATA: ExamData[] = [
 3. Colab에서 CSV 파일 사용 가능
 4. QR 코드 생성 가능
 
+
+

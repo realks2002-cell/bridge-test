@@ -28,28 +28,8 @@ print()
 # ============================================
 print("📊 실습 문제 데이터 로드 중...")
 
-csv_url = 'https://bridge-mock-exam-nextjs.vercel.app/data/exam1.csv'
-print(f"CSV URL: {csv_url}")
-
-# 캐시 방지를 위해 타임스탬프 추가
-import time
-cache_buster = int(time.time())
-csv_url_with_cache = f"{csv_url}?t={cache_buster}&v=2"
-
-# 여러 줄 필드를 포함한 CSV 읽기
-import urllib.request
-response = urllib.request.urlopen(csv_url_with_cache)
-csv_content = response.read().decode('utf-8-sig')
-
-# pandas로 CSV 읽기 (여러 줄 필드 지원)
-df = pd.read_csv(
-    io.StringIO(csv_content),
-    encoding='utf-8-sig',
-    index_col=False,
-    on_bad_lines='skip',
-    quotechar='"',
-    skipinitialspace=True
-)
+csv_url = 'https://bridge-mock-exam-nextjs.vercel.app/data/exam1_practice.csv'
+df = pd.read_csv(csv_url, encoding='utf-8-sig', index_col=False, on_bad_lines='skip')
 
 # 문제번호 컬럼이 있으면 제거
 if '문제번호' in df.columns:
@@ -57,17 +37,6 @@ if '문제번호' in df.columns:
 
 print(f"✅ 데이터 로드 완료! (총 {len(df)}문제)")
 print(f"컬럼명: {df.columns.tolist()}")
-print()
-
-# 실습 문제 형식인지 확인
-if '문제유형' in df.columns and '데이터셋URL' in df.columns and '코드템플릿' in df.columns:
-    print("✅ 실습 문제 형식으로 인식되었습니다.")
-else:
-    print("⚠️ 경고: 실습 문제 형식이 아닙니다!")
-    print("사용 가능한 컬럼:", df.columns.tolist())
-    print("\n첫 번째 문제 미리보기:")
-    if len(df) > 0:
-        print(df.iloc[0].to_dict())
 print()
 
 # ============================================
@@ -404,3 +373,5 @@ solver.show_question(1)
 
 # 모든 문제를 풀고 나면 아래 코드를 실행하여 결과를 확인하세요
 # solver.show_results()
+
+

@@ -23,3 +23,5 @@ export default function Header({ currentPage = '홈' }: HeaderProps) {
   );
 }
 
+
+

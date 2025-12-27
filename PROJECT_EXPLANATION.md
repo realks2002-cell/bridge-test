@@ -175,3 +175,5 @@ predictions = model.predict(X)
 
 즉, **실제 문제 풀이는 Colab에서, 웹사이트는 접근을 돕는 역할**입니다!
 
+
+

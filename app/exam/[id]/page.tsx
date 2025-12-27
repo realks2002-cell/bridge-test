@@ -14,6 +14,7 @@ export default function ExamPage() {
 
   const [examData, setExamData] = useState<Question[]>([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswer>({});
+  const [userCodes, setUserCodes] = useState<{ [questionNum: number]: string }>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [isPracticeFormat, setIsPracticeFormat] = useState(false);
@@ -47,6 +48,10 @@ export default function ExamPage() {
     setUserAnswers((prev) => ({ ...prev, [questionNum]: answer }));
   };
 
+  const updateCode = (questionNum: number, code: string) => {
+    setUserCodes((prev) => ({ ...prev, [questionNum]: code }));
+  };
+
   const resetAnswers = () => {
     if (confirm('모든 답안을 초기화하시겠습니까?')) {
       setUserAnswers({});
@@ -59,20 +64,39 @@ export default function ExamPage() {
     let correctCount = 0;
     const results: ExamResult[] = examData.map((question, index) => {
       const questionNum = index + 1;
-      const userAnswer = userAnswers[questionNum];
-      const correctAnswer = question.정답;
-      const isCorrect = userAnswer === correctAnswer;
+      
+      if (isPracticeFormat) {
+        const userCode = userCodes[questionNum] || '';
+        const correctAnswer = question.정답;
+        // 실습 문제는 코드가 작성되었는지만 확인 (정확한 검증은 Colab에서)
+        const isCorrect = userCode.trim() !== '';
+        
+        if (isCorrect) correctCount++;
 
-      if (isCorrect) correctCount++;
+        return {
+          번호: questionNum,
+          문제: question.문제,
+          사용자답: userCode || '코드 미작성',
+          정답: correctAnswer,
+          정오: isCorrect,
+          해설: question.해설,
+        };
+      } else {
+        const userAnswer = userAnswers[questionNum];
+        const correctAnswer = question.정답;
+        const isCorrect = userAnswer === correctAnswer;
 
-      return {
-        번호: questionNum,
-        문제: question.문제,
-        사용자답: userAnswer || '미답',
-        정답: correctAnswer,
-        정오: isCorrect,
-        해설: question.해설,
-      };
+        if (isCorrect) correctCount++;
+
+        return {
+          번호: questionNum,
+          문제: question.문제,
+          사용자답: userAnswer || '미답',
+          정답: correctAnswer,
+          정오: isCorrect,
+          해설: question.해설,
+        };
+      }
     });
 
     const score = Math.round((correctCount / examData.length) * 100);
@@ -96,7 +120,9 @@ export default function ExamPage() {
     router.push(`/result/${exam.id}`);
   };
 
-  const answeredCount = Object.keys(userAnswers).length;
+  const answeredCount = isPracticeFormat 
+    ? Object.keys(userCodes).filter(key => userCodes[parseInt(key)]?.trim() !== '').length
+    : Object.keys(userAnswers).length;
   const totalCount = examData.length;
   const progress = totalCount > 0 ? Math.round((answeredCount / totalCount) * 100) : 0;
   const canSubmit = answeredCount === totalCount && totalCount > 0;
@@ -146,62 +172,6 @@ export default function ExamPage() {
     );
   }
 
-  // 실습 문제 형식인 경우 Colab 노트북 사용 안내
-  if (isPracticeFormat && exam) {
-    return (
-      <>
-        <Header currentPage={exam.title || '문제 풀이'} />
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-              <div className="flex items-start gap-3">
-                <svg
-                  className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-blue-900 mb-2">실습 문제 안내</h3>
-                  <p className="text-sm text-blue-800 mb-4">
-                    이 모의고사는 코드 작성 실습 문제입니다. 웹사이트에서는 풀 수 없으며, Google Colab 노트북에서 풀어주세요.
-                  </p>
-                  <a
-                    href={exam.colabUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors font-medium"
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                      />
-                    </svg>
-                    Colab 노트북 열기
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
@@ -218,6 +188,7 @@ export default function ExamPage() {
             {examData.map((question, index) => {
               const questionNum = index + 1;
               const isAnswered = userAnswers[questionNum] !== undefined;
+              const hasCode = userCodes[questionNum] !== undefined && userCodes[questionNum].trim() !== '';
               const answerClass = isAnswered
                 ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-300';
@@ -232,41 +203,107 @@ export default function ExamPage() {
                       <h3 className="text-lg font-bold text-gray-900">
                         문제 {question.번호 || questionNum}
                       </h3>
-                      {isAnswered && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                          답변 완료
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-gray-800 leading-relaxed">{question.문제}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    {[1, 2, 3, 4].map((num) => {
-                      const choiceKey = `선택지${num}` as keyof Question;
-                      const choice = question[choiceKey];
-                      const value = String(num);
-
-                      return (
-                        <label
-                          key={num}
-                          className={`flex items-center p-3 border-2 ${answerClass} rounded-md cursor-pointer hover:bg-gray-50 transition-colors`}
-                        >
-                          <input
-                            type="radio"
-                            name={`question-${questionNum}`}
-                            value={value}
-                            checked={userAnswers[questionNum] === value}
-                            onChange={() => selectAnswer(questionNum, value)}
-                            className="w-5 h-5 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span className="ml-3 text-gray-700">
-                            {['①', '②', '③', '④'][num - 1]} {choice}
+                      <div className="flex gap-2">
+                        {question.문제유형 && (
+                          <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                            {question.문제유형}
                           </span>
-                        </label>
-                      );
-                    })}
+                        )}
+                        {question.난이도 && (
+                          <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                            {question.난이도}
+                          </span>
+                        )}
+                        {hasCode && (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                            코드 작성 완료
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-gray-800 leading-relaxed mb-3">{question.문제}</p>
+                    {question.데이터셋URL && (
+                      <div className="mb-3 p-3 bg-gray-50 rounded-md">
+                        <p className="text-sm text-gray-600">
+                          <span className="font-medium">데이터셋:</span>{' '}
+                          <a
+                            href={question.데이터셋URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline break-all"
+                          >
+                            {question.데이터셋URL}
+                          </a>
+                        </p>
+                      </div>
+                    )}
                   </div>
+
+                  {/* 실습 문제 형식일 때 코드 작성 상자 */}
+                  {isPracticeFormat ? (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        코드 작성
+                      </label>
+                      <textarea
+                        value={userCodes[questionNum] || question.코드템플릿 || ''}
+                        onChange={(e) => updateCode(questionNum, e.target.value)}
+                        placeholder="여기에 Python 코드를 작성하세요..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm min-h-[200px] resize-y"
+                        style={{ fontFamily: 'monospace' }}
+                      />
+                      <div className="mt-2 flex gap-2">
+                        <a
+                          href={exam?.colabUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-sm font-medium"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                            />
+                          </svg>
+                          Colab에서 실행
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {[1, 2, 3, 4].map((num) => {
+                        const choiceKey = `선택지${num}` as keyof Question;
+                        const choice = question[choiceKey];
+                        const value = String(num);
+
+                        return (
+                          <label
+                            key={num}
+                            className={`flex items-center p-3 border-2 ${answerClass} rounded-md cursor-pointer hover:bg-gray-50 transition-colors`}
+                          >
+                            <input
+                              type="radio"
+                              name={`question-${questionNum}`}
+                              value={value}
+                              checked={userAnswers[questionNum] === value}
+                              onChange={() => selectAnswer(questionNum, value)}
+                              className="w-5 h-5 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="ml-3 text-gray-700">
+                              {['①', '②', '③', '④'][num - 1]} {choice}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -277,7 +314,7 @@ export default function ExamPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
               <div className="text-sm text-gray-600">
                 <span className="font-semibold">{answeredCount}</span> /{' '}
-                <span>{totalCount}</span> 문제 풀이 완료
+                <span>{totalCount}</span> {isPracticeFormat ? '문제 코드 작성 완료' : '문제 풀이 완료'}
               </div>
               <div className="flex gap-3">
                 <button

@@ -92,3 +92,4 @@ csv_url = 'https://bridge-mock-exam-nextjs.vercel.app/data/exam3.csv'  # exam3
 - 숫자 비교는 부동소수점 오차를 고려 (0.0001 이내)
 - 문자열 비교는 공백 제거 후 비교
 
+

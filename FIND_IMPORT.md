@@ -37,3 +37,5 @@ https://vercel.com/new
 4. Project Name: `bridge-mock-exam` 입력
 5. **"Deploy"** 클릭
 
+
+
