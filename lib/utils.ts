@@ -211,12 +211,14 @@ export async function loadExamData(csvUrl: string): Promise<{ questions: Questio
     const arrayBuffer = await response.arrayBuffer();
     const decoder = new TextDecoder('utf-8');
     const csvText = decoder.decode(arrayBuffer);
-    const lines = csvText.trim().split('\n');
-    if (lines.length === 0) {
+    
+    // 여러 줄 필드를 포함한 CSV 파싱
+    const rows = parseCSVWithMultiline(csvText);
+    if (rows.length === 0) {
       throw new Error('CSV 파일이 비어있습니다.');
     }
     
-    const headers = lines[0].split(',').map((h) => h.trim());
+    const headers = rows[0].map((h) => h.trim());
     const isPracticeFormat = headers.includes('문제유형') || headers.includes('데이터셋URL') || headers.includes('코드템플릿');
     
     const questions = parseCSV(csvText);
