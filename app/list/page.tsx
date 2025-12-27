@@ -73,7 +73,7 @@ export default function ListPage() {
                   {/* 문제 풀기 버튼 */}
                   <Link
                     href={`/exam/${exam.id}`}
-                    className="block w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-center font-medium min-h-[44px] mb-3"
+                    className="block w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-center font-medium min-h-[44px]"
                   >
                     <span className="flex items-center justify-center gap-2">
                       <svg
@@ -92,31 +92,6 @@ export default function ListPage() {
                       문제 풀기
                     </span>
                   </Link>
-
-                  {/* Colab 열기 버튼 */}
-                  <a
-                    href={exam.colabUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-center font-medium min-h-[44px]"
-                  >
-                    <span className="flex items-center justify-center gap-2">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                      Colab 노트북 열기
-                    </span>
-                  </a>
                 </div>
               </div>
             );
